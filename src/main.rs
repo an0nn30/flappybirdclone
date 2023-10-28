@@ -3,6 +3,7 @@ use crate::player::PlayerPlugin;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::plugin::{NoUserData, RapierPhysicsPlugin};
+use crate::world::World;
 
 mod game;
 mod player;
@@ -22,6 +23,7 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest())),
         )
+        .add_plugins(World)
         .add_plugins(GamePlugin)
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugins(PlayerPlugin)
