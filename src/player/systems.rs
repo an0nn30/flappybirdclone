@@ -37,8 +37,8 @@ pub fn player_movement(
     // Define the flap strength
     let flap_strength = Vec2::new(0.0, 350.0); // Adjust as needed
 
-    let rotation_speed = 1.0; // Adjust as needed
-    let max_rotation = 90.0f32.to_radians(); // 90 degrees in radians
+    let rotation_speed = 90.5; // Adjust as needed
+    let max_rotation = 30.0f32.to_radians(); // 90 degrees in radians
     let min_rotation = -30.0f32.to_radians(); // -30 degrees in radians
 
     if let Ok((mut velocity, mut transform)) = player_query.get_single_mut() {
@@ -47,15 +47,15 @@ pub fn player_movement(
             // Apply the flap force
             velocity.linvel = flap_strength;
             println!("Velocity: {:?}", velocity);
+            transform.rotation = Quat::from_rotation_z(max_rotation);
         }
 
         // Determine rotation direction based on vertical velocity
         let rotation_change = rotation_speed * time.delta_seconds().to_radians();
-        if velocity.linvel.y > 0.0 && transform.rotation.to_euler(EulerRot::XYZ).2 < max_rotation {
-            transform.rotate(Quat::from_rotation_z(rotation_change));
-        } else if velocity.linvel.y < 0.0
-            && transform.rotation.to_euler(EulerRot::XYZ).2 > min_rotation
-        {
+        // if velocity.linvel.y > 0.0 && transform.rotation.to_euler(EulerRot::XYZ).2 < max_rotation {
+        //     transform.rotate(Quat::from_rotation_z(rotation_change));
+        // }
+        if velocity.linvel.y < 0.0 && transform.rotation.to_euler(EulerRot::XYZ).2 > min_rotation {
             transform.rotate(Quat::from_rotation_z(-rotation_change));
         }
     } else {
