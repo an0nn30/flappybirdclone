@@ -31,7 +31,7 @@ pub fn spawn_player(
 
 pub fn player_movement(
     keyboard_input: Res<Input<KeyCode>>,
-    mut player_query: Query<(&mut Velocity, &mut Transform, &Player)>,
+    mut player_query: Query<(&mut Velocity, &mut Transform), With<Player>>,
     time: Res<Time>,
 ) {
     // Define the flap strength
@@ -41,7 +41,7 @@ pub fn player_movement(
     let max_rotation = 90.0f32.to_radians(); // 90 degrees in radians
     let min_rotation = -30.0f32.to_radians(); // -30 degrees in radians
 
-    for (mut velocity, mut transform, _) in player_query.iter_mut() {
+    if let Ok((mut velocity, mut transform)) = player_query.get_single_mut() {
         if keyboard_input.just_pressed(KeyCode::Space) {
             // Flap on spacebar press
             // Apply the flap force
@@ -58,5 +58,7 @@ pub fn player_movement(
         {
             transform.rotate(Quat::from_rotation_z(-rotation_change));
         }
+    } else {
+        eprintln!("unable to load player");
     }
 }
