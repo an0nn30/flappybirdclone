@@ -1,14 +1,14 @@
+use crate::world::systems::{move_ground, spawn_background, spawn_bricks};
 use bevy::prelude::*;
-use crate::world::systems::spawn_world;
 
-
-mod systems;
 mod components;
+mod systems;
 
 pub struct World;
 
 impl Plugin for World {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn_world);
+        app.add_systems(Startup, (spawn_background, spawn_bricks))
+            .add_systems(Update, move_ground);
     }
 }

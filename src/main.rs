@@ -1,9 +1,9 @@
 use crate::game::GamePlugin;
 use crate::player::PlayerPlugin;
+use crate::world::World;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::plugin::{NoUserData, RapierPhysicsPlugin};
-use crate::world::World;
 
 mod game;
 mod player;
@@ -17,6 +17,9 @@ fn main() {
                 .set(WindowPlugin {
                     primary_window: Some(Window {
                         resolution: (288., 512.).into(),
+                        title: "Flappy Bird Clone".into(),
+                        decorations: true,
+                        resizable: false,
                         ..default()
                     }),
                     ..default()
