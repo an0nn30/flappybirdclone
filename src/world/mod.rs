@@ -2,7 +2,7 @@ use crate::world::systems::{move_ground, spawn_background, spawn_bricks};
 use crate::GameState;
 use bevy::prelude::*;
 
-mod components;
+pub mod components;
 mod systems;
 
 pub struct WorldPlugin;

@@ -3,7 +3,7 @@ use crate::pipe::systems::{pipe_movement, spawn_pipes, tick_pipe_spawn_timer};
 use crate::GameState;
 use bevy::prelude::*;
 
-mod components;
+pub mod components;
 mod resources;
 mod systems;
 

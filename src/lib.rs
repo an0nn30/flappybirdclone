@@ -2,9 +2,11 @@ use crate::game::GamePlugin;
 use crate::pipe::PipePlugin;
 use crate::player::PlayerPlugin;
 use crate::world::WorldPlugin;
+use bevy::log::{Level, LogPlugin};
 use bevy::prelude::*;
 use bevy::window::{PrimaryWindow, WindowMode};
 use bevy_rapier2d::plugin::{NoUserData, RapierPhysicsPlugin};
+use bevy_rapier2d::prelude::*;
 
 mod game;
 mod player;
@@ -12,6 +14,7 @@ mod systems;
 mod world;
 
 mod pipe;
+mod ui;
 
 #[bevy_main]
 pub fn main() {
@@ -19,9 +22,14 @@ pub fn main() {
         .add_plugins(
             (DefaultPlugins
                 .set(setup_window())
-                .set(ImagePlugin::default_nearest())),
+                .set(ImagePlugin::default_nearest())
+                .set(LogPlugin {
+                    level: Level::DEBUG,
+                    filter: "wgpu=error,bevy_render=info,bevy_ecs=trace,winit=error".to_string(),
+                })),
         )
         .add_state::<GameState>()
+        // .add_plugins(RapierDebugRenderPlugin::default())
         .add_plugins(GamePlugin)
         .add_plugins(WorldPlugin)
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
@@ -82,7 +90,7 @@ fn setup_window() -> WindowPlugin {
         resolution: (288., 512.).into(),
         title: "Flappy Bird Clone".into(),
         decorations: true,
-        resizable: true,
+        resizable: false,
         ..default()
     };
 

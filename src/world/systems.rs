@@ -1,6 +1,8 @@
 use crate::world::components::{Ground, GroundType};
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
+use bevy_rapier2d::dynamics::RigidBody;
+use bevy_rapier2d::prelude::*;
 
 pub fn spawn_background(
     mut commands: Commands,
@@ -30,6 +32,22 @@ pub fn spawn_bricks(
     let texture_width = window.width();
     let texture_handle = asset_server.load("textures/base.png");
 
+    // Define the collider size
+    let collider_size = Vec2::new(336., 165.);
+
+    // Common components for both ground sprites
+    let ground1_components = (
+        RigidBody::Fixed,
+        Collider::cuboid(collider_size.x / 2.0, collider_size.y / 2.0),
+        ActiveEvents::COLLISION_EVENTS,
+    );
+
+    let ground2_components = (
+        RigidBody::Fixed,
+        Collider::cuboid(collider_size.x / 2.0, collider_size.y / 2.0),
+        ActiveEvents::COLLISION_EVENTS,
+    );
+
     // Spawn the first sprite
     commands.spawn((
         SpriteBundle {
@@ -41,6 +59,7 @@ pub fn spawn_bricks(
             },
             ..Default::default()
         },
+        ground1_components,
         Ground,
         GroundType::Left,
     ));
@@ -56,6 +75,7 @@ pub fn spawn_bricks(
             },
             ..Default::default()
         },
+        ground2_components,
         Ground,
         GroundType::Right,
     ));

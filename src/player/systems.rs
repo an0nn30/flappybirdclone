@@ -33,6 +33,7 @@ pub fn player_movement(
     keyboard_input: Res<Input<KeyCode>>,
     touch_input: Res<Events<TouchInput>>,
     game_state: Res<State<GameState>>,
+    mut next_game_state: ResMut<NextState<GameState>>,
     mut player_query: Query<(&mut Velocity, &mut Transform, &mut GravityScale), With<Player>>,
     time: Res<Time>,
 ) {
@@ -44,8 +45,6 @@ pub fn player_movement(
     let min_rotation = -30.0f32.to_radians(); // -30 degrees in radians
 
     if let Ok((mut velocity, mut transform, mut gravity)) = player_query.get_single_mut() {
-        // commands.entity(*entity).insert(GravityScale(9.8));
-
         if game_state.get().ne(&(GameState::Running).into()) {
             velocity.linvel = Vec2::new(0., 0.);
             gravity.0 = 0.0;
@@ -53,31 +52,30 @@ pub fn player_movement(
         } else {
             gravity.0 = 9.8;
         }
+
         if keyboard_input.just_pressed(KeyCode::Space) {
             // Flap on spacebar press
             // Apply the flap force
             velocity.linvel = flap_strength;
-            println!("Velocity: {:?}", velocity);
+            debug!("Velocity: {:?}", velocity);
             transform.rotation = Quat::from_rotation_z(max_rotation);
         }
 
         // Determine rotation direction based on vertical velocity
         let rotation_change = rotation_speed * time.delta_seconds().to_radians();
-        // if velocity.linvel.y > 0.0 && transform.rotation.to_euler(EulerRot::XYZ).2 < max_rotation {
-        //     transform.rotate(Quat::from_rotation_z(rotation_change));
-        // }
+
         if velocity.linvel.y < 0.0 && transform.rotation.to_euler(EulerRot::XYZ).2 > min_rotation {
             transform.rotate(Quat::from_rotation_z(-rotation_change));
         }
     } else {
-        eprintln!("unable to load player");
+        error!("unable to load player");
     }
 
     for event in touch_input.get_reader().iter(&touch_input) {
         if event.phase == TouchPhase::Started {
             // If there's a touch, consider it as a 'flap' action
             if let Ok((mut velocity, mut transform, mut gravity)) = player_query.get_single_mut() {
-                println!("Velocity: {:?}", velocity);
+                debug!("Velocity: {:?}", velocity);
                 velocity.linvel = flap_strength;
                 transform.rotation = Quat::from_rotation_z(max_rotation);
             }

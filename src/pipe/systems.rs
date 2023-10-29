@@ -2,6 +2,8 @@ use crate::pipe::components::PipePair;
 use crate::pipe::resources::PipeSpawnTimer;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
+use bevy_rapier2d::prelude::*;
+use log::debug;
 use rand::Rng;
 
 pub fn spawn_pipes(
@@ -14,7 +16,7 @@ pub fn spawn_pipes(
         let window = window_query.get_single().unwrap();
         let pipe_pair_entity = build_pipe_pair(&mut commands, &asset_server, &window_query);
         let y = random_range(180.0, window.height() - 100.0);
-        println!("Spawning pipe on y: {}", y);
+        debug!("Spawning pipe on y: {}", y);
         commands
             .entity(pipe_pair_entity)
             .insert(Transform::from_xyz(window.width() + 50., y, 0.0));
@@ -45,6 +47,19 @@ fn build_pipe_pair(
     let spacing = 300.;
 
     let pipe_size = Vec2::new(50.0, 300.0);
+    let collider_size = Vec2::new(52., 480.);
+    // Common components for both ground sprites
+    let pipe1_components = (
+        RigidBody::Fixed,
+        Collider::cuboid(collider_size.x / 2.0, collider_size.y / 2.0),
+        ActiveEvents::COLLISION_EVENTS,
+    );
+
+    let pipe2_components = (
+        RigidBody::Fixed,
+        Collider::cuboid(collider_size.x / 2.0, collider_size.y / 2.0),
+        ActiveEvents::COLLISION_EVENTS,
+    );
 
     // This function will spawn the pipes as a single entity, which will make it easier to manipulate the pair together.
     commands
@@ -56,24 +71,30 @@ fn build_pipe_pair(
             PipePair { spacing },
         ))
         .with_children(|parent| {
-            parent.spawn(SpriteBundle {
-                texture: asset_server.load("textures/pipe-green.png"),
-                transform: Transform {
-                    translation: Vec3::new(0.0, -spacing / 2.0 - pipe_size.y / 2.0, 0.0),
+            parent.spawn((
+                SpriteBundle {
+                    texture: asset_server.load("textures/bottom-pipe.png"),
+                    transform: Transform {
+                        translation: Vec3::new(0.0, -spacing / 2.0 - pipe_size.y / 2.0, 0.0),
+                        ..Default::default()
+                    },
                     ..Default::default()
                 },
-                ..Default::default()
-            });
+                pipe1_components,
+            ));
             // Add top pipe
-            parent.spawn(SpriteBundle {
-                texture: asset_server.load("textures/pipe-green.png"),
-                transform: Transform {
-                    translation: Vec3::new(0.0, spacing / 2.0 + pipe_size.y / 2.0, 0.0),
-                    scale: Vec3::new(1.0, -1.0, 1.0), // Inverted scale for the bottom pipe
+            parent.spawn((
+                SpriteBundle {
+                    texture: asset_server.load("textures/top-pipe.png"),
+                    transform: Transform {
+                        translation: Vec3::new(0.0, spacing / 2.0 + pipe_size.y / 2.0, 0.0),
+                        // scale: Vec3::new(1.0, -1.0, 1.0), // Inverted scale for the bottom pipe
+                        ..Default::default()
+                    },
                     ..Default::default()
                 },
-                ..Default::default()
-            });
+                pipe2_components,
+            ));
 
             // Add bottom pipe
         })

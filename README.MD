@@ -61,3 +61,11 @@ Contributions to FlappyBirdRustClone are welcome! Whether it's bug fixes, improv
 ## License
 
 This project is licensed under MIT License. Feel free to use, modify, and distribute the code as per the license terms.
+
+
+## TODOs
+
+- [ ] add collision detection for the ground and pipes
+- [ ] add detection for passing through pipes to add to score
+- [ ] add score tracking
+- [ ] add UI

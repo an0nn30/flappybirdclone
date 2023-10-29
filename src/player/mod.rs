@@ -3,7 +3,7 @@ use crate::GameState;
 use bevy::prelude::*;
 use std::sync::OnceState;
 
-mod components;
+pub mod components;
 mod systems;
 
 pub struct PlayerPlugin;
