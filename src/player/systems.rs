@@ -1,10 +1,10 @@
 use crate::player::components::Player;
 use bevy::input::touch::TouchPhase;
 use bevy::prelude::*;
-use bevy::ui::AlignItems::Default;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;
 use bevy_rapier2d::rapier::dynamics::RigidBodyForces;
+use std::default::Default;
 
 // TODO: Figure out how to get the correct window size
 pub fn spawn_player(
@@ -18,15 +18,7 @@ pub fn spawn_player(
     let collider_size = Vec2::new(16.0, 16.0); // Adjust the size as needed
 
     commands.spawn((
-        SpriteBundle {
-            texture: asset_server.load("textures/yellowbird-midflap.png"),
-            transform: Transform::from_xyz(window.width() / 2., window.height() / 2., 0.),
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(36., 34.)),
-                ..default()
-            },
-            ..default()
-        },
+        setup_sprite(&asset_server, &window),
         Player,
         RigidBody::Dynamic,
         Collider::cuboid(collider_size.x / 2.0, collider_size.y / 2.0),
@@ -78,5 +70,23 @@ pub fn player_movement(
                 transform.rotation = Quat::from_rotation_z(max_rotation);
             }
         }
+    }
+}
+
+fn setup_sprite(asset_server: &AssetServer, window: &Window) -> SpriteBundle {
+    #[cfg(target_os = "ios")]
+    let sprite = Sprite {
+        custom_size: Some(Vec2::new(36., 34.)),
+        ..default()
+    };
+
+    #[cfg(not(target_os = "ios"))]
+    let sprite = Sprite::default();
+
+    SpriteBundle {
+        texture: asset_server.load("textures/yellowbird-midflap.png"),
+        transform: Transform::from_xyz(window.width() / 2., window.height() / 2., 0.),
+        sprite,
+        ..default()
     }
 }
