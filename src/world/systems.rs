@@ -12,8 +12,11 @@ pub fn spawn_background(
 
     commands.spawn(SpriteBundle {
         texture: texture_handle,
-        transform: Transform::from_xyz(window.width() / 2., window.height() / 2., -10.0), // z set to -10 to render behind everything else
-        // sprite: Sprite::new(Vec2::new(window.width(), window.height())), // This assumes your background image covers the whole window
+        transform: Transform::from_xyz(window.width() / 2., window.height() / 2., -10.0),
+        sprite: Sprite {
+            custom_size: Some(Vec2::new(window.width(), window.height())), // Set sprite size to window dimensions
+            ..Default::default()
+        },
         ..Default::default()
     });
 }
@@ -32,7 +35,11 @@ pub fn spawn_bricks(
         SpriteBundle {
             texture: texture_handle.clone(),
             transform: Transform::from_xyz(-texture_width / 2., 50., -9.),
-            ..default()
+            sprite: Sprite {
+                custom_size: Some(Vec2::new(window.width(), window.height() / 3.)),
+                ..Default::default()
+            },
+            ..Default::default()
         },
         Ground,
         GroundType::Left,
@@ -43,7 +50,11 @@ pub fn spawn_bricks(
         SpriteBundle {
             texture: texture_handle,
             transform: Transform::from_xyz(texture_width / 2., 50., -9.),
-            ..default()
+            sprite: Sprite {
+                custom_size: Some(Vec2::new(window.width(), window.height() / 3.)),
+                ..Default::default()
+            },
+            ..Default::default()
         },
         Ground,
         GroundType::Right,

@@ -1,5 +1,7 @@
 use crate::player::components::Player;
+use bevy::input::touch::TouchPhase;
 use bevy::prelude::*;
+use bevy::ui::AlignItems::Default;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;
 use bevy_rapier2d::rapier::dynamics::RigidBodyForces;
@@ -19,6 +21,10 @@ pub fn spawn_player(
         SpriteBundle {
             texture: asset_server.load("textures/yellowbird-midflap.png"),
             transform: Transform::from_xyz(window.width() / 2., window.height() / 2., 0.),
+            sprite: Sprite {
+                custom_size: Some(Vec2::new(36., 34.)),
+                ..default()
+            },
             ..default()
         },
         Player,
@@ -31,6 +37,7 @@ pub fn spawn_player(
 
 pub fn player_movement(
     keyboard_input: Res<Input<KeyCode>>,
+    touch_input: Res<Events<TouchInput>>,
     mut player_query: Query<(&mut Velocity, &mut Transform), With<Player>>,
     time: Res<Time>,
 ) {
@@ -60,5 +67,16 @@ pub fn player_movement(
         }
     } else {
         eprintln!("unable to load player");
+    }
+
+    for event in touch_input.get_reader().iter(&touch_input) {
+        if event.phase == TouchPhase::Started {
+            // If there's a touch, consider it as a 'flap' action
+            if let Ok((mut velocity, mut transform)) = player_query.get_single_mut() {
+                println!("Velocity: {:?}", velocity);
+                velocity.linvel = flap_strength;
+                transform.rotation = Quat::from_rotation_z(max_rotation);
+            }
+        }
     }
 }
