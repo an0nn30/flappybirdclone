@@ -1,4 +1,5 @@
 use crate::player::components::Player;
+use crate::GameState;
 use bevy::input::touch::TouchPhase;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -28,9 +29,11 @@ pub fn spawn_player(
 }
 
 pub fn player_movement(
+    mut commands: Commands,
     keyboard_input: Res<Input<KeyCode>>,
     touch_input: Res<Events<TouchInput>>,
-    mut player_query: Query<(&mut Velocity, &mut Transform), With<Player>>,
+    game_state: Res<State<GameState>>,
+    mut player_query: Query<(&mut Velocity, &mut Transform, &mut GravityScale), With<Player>>,
     time: Res<Time>,
 ) {
     // Define the flap strength
@@ -40,7 +43,16 @@ pub fn player_movement(
     let max_rotation = 30.0f32.to_radians(); // 90 degrees in radians
     let min_rotation = -30.0f32.to_radians(); // -30 degrees in radians
 
-    if let Ok((mut velocity, mut transform)) = player_query.get_single_mut() {
+    if let Ok((mut velocity, mut transform, mut gravity)) = player_query.get_single_mut() {
+        // commands.entity(*entity).insert(GravityScale(9.8));
+
+        if game_state.get().ne(&(GameState::Running).into()) {
+            velocity.linvel = Vec2::new(0., 0.);
+            gravity.0 = 0.0;
+            return;
+        } else {
+            gravity.0 = 9.8;
+        }
         if keyboard_input.just_pressed(KeyCode::Space) {
             // Flap on spacebar press
             // Apply the flap force
@@ -64,7 +76,7 @@ pub fn player_movement(
     for event in touch_input.get_reader().iter(&touch_input) {
         if event.phase == TouchPhase::Started {
             // If there's a touch, consider it as a 'flap' action
-            if let Ok((mut velocity, mut transform)) = player_query.get_single_mut() {
+            if let Ok((mut velocity, mut transform, mut gravity)) = player_query.get_single_mut() {
                 println!("Velocity: {:?}", velocity);
                 velocity.linvel = flap_strength;
                 transform.rotation = Quat::from_rotation_z(max_rotation);
@@ -74,13 +86,13 @@ pub fn player_movement(
 }
 
 fn setup_sprite(asset_server: &AssetServer, window: &Window) -> SpriteBundle {
-    #[cfg(target_os = "ios")]
-    let sprite = Sprite {
-        custom_size: Some(Vec2::new(36., 34.)),
-        ..default()
-    };
-
-    #[cfg(not(target_os = "ios"))]
+    // #[cfg(target_os = "ios")]
+    // let sprite = Sprite {
+    //     custom_size: Some(Vec2::new(40., 30.)),
+    //     ..default()
+    // };
+    //
+    // #[cfg(not(target_os = "ios"))]
     let sprite = Sprite::default();
 
     SpriteBundle {

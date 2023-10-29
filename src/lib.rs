@@ -1,7 +1,7 @@
 use crate::game::GamePlugin;
 use crate::pipe::PipePlugin;
 use crate::player::PlayerPlugin;
-use crate::world::World;
+use crate::world::WorldPlugin;
 use bevy::prelude::*;
 use bevy::window::{PrimaryWindow, WindowMode};
 use bevy_rapier2d::plugin::{NoUserData, RapierPhysicsPlugin};
@@ -21,8 +21,9 @@ pub fn main() {
                 .set(setup_window())
                 .set(ImagePlugin::default_nearest())),
         )
-        .add_plugins(World)
+        .add_state::<GameState>()
         .add_plugins(GamePlugin)
+        .add_plugins(WorldPlugin)
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugins(PlayerPlugin)
         .add_plugins(PipePlugin)
@@ -33,6 +34,19 @@ pub fn main() {
 pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
     let window = window_query.get_single().unwrap();
 
+    #[cfg(target_os = "ios")]
+    let global_scale_factor = Vec3::splat(0.8);
+    #[cfg(target_os = "ios")]
+    commands.spawn(Camera2dBundle {
+        transform: Transform {
+            translation: Vec3::new(window.width() / 2.0, window.height() / 2.0, 0.0),
+            scale: global_scale_factor,
+            ..Default::default()
+        },
+        ..default()
+    });
+
+    #[cfg(not(target_os = "ios"))]
     commands.spawn(Camera2dBundle {
         transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
         ..default()
@@ -76,4 +90,11 @@ fn setup_window() -> WindowPlugin {
         primary_window: Some(window),
         ..default()
     }
+}
+
+#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
+pub enum GameState {
+    Running,
+    #[default]
+    GameOver,
 }

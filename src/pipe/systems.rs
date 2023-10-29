@@ -13,7 +13,8 @@ pub fn spawn_pipes(
     if pipe_spawn_timer.timer.finished() {
         let window = window_query.get_single().unwrap();
         let pipe_pair_entity = build_pipe_pair(&mut commands, &asset_server, &window_query);
-        let y = random_range(120.0, window.height() - 100.0);
+        let y = random_range(180.0, window.height() - 100.0);
+        println!("Spawning pipe on y: {}", y);
         commands
             .entity(pipe_pair_entity)
             .insert(Transform::from_xyz(window.width() + 50., y, 0.0));
@@ -86,4 +87,22 @@ pub fn tick_pipe_spawn_timer(mut pipe_spawn_timer: ResMut<PipeSpawnTimer>, time:
 fn random_range(min: f32, max: f32) -> f32 {
     let mut rng = rand::thread_rng(); // Get a copy of the random number generator
     rng.gen_range(min..max) // Generate a random number in the range
+}
+
+fn setup_sprite(asset_server: &AssetServer, window: &Window) -> SpriteBundle {
+    #[cfg(target_os = "ios")]
+    let sprite = Sprite {
+        custom_size: Some(Vec2::new(36., 34.)),
+        ..default()
+    };
+
+    #[cfg(not(target_os = "ios"))]
+    let sprite = Sprite::default();
+
+    SpriteBundle {
+        texture: asset_server.load("textures/yellowbird-midflap.png"),
+        transform: Transform::from_xyz(window.width() / 2., window.height() / 2., 0.),
+        sprite,
+        ..default()
+    }
 }

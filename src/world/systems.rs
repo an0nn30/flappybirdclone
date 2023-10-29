@@ -34,7 +34,7 @@ pub fn spawn_bricks(
     commands.spawn((
         SpriteBundle {
             texture: texture_handle.clone(),
-            transform: Transform::from_xyz(-texture_width / 2., 50., -9.),
+            transform: Transform::from_xyz(-texture_width / 2., 20., -9.),
             sprite: Sprite {
                 custom_size: Some(Vec2::new(window.width(), window.height() / 3.)),
                 ..Default::default()
@@ -49,7 +49,7 @@ pub fn spawn_bricks(
     commands.spawn((
         SpriteBundle {
             texture: texture_handle,
-            transform: Transform::from_xyz(texture_width / 2., 50., -9.),
+            transform: Transform::from_xyz(texture_width / 2., 20., -9.),
             sprite: Sprite {
                 custom_size: Some(Vec2::new(window.width(), window.height() / 3.)),
                 ..Default::default()
