@@ -68,7 +68,7 @@ pub fn move_ground(
 ) {
     let window = window_query.get_single().unwrap();
     let ground_width = window.width();
-    let speed = 200.0; // Ground movement speed
+    let speed = 150.0; // Ground movement speed
 
     let mut left_ground_transform = None;
     let mut right_ground_transform = None;

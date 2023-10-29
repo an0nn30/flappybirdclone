@@ -1,4 +1,5 @@
 use crate::game::GamePlugin;
+use crate::pipe::PipePlugin;
 use crate::player::PlayerPlugin;
 use crate::world::World;
 use bevy::prelude::*;
@@ -9,6 +10,8 @@ mod game;
 mod player;
 mod systems;
 mod world;
+
+mod pipe;
 
 #[bevy_main]
 pub fn main() {
@@ -22,6 +25,7 @@ pub fn main() {
         .add_plugins(GamePlugin)
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugins(PlayerPlugin)
+        .add_plugins(PipePlugin)
         .add_systems(Startup, spawn_camera)
         .run();
 }
@@ -64,7 +68,7 @@ fn setup_window() -> WindowPlugin {
         resolution: (288., 512.).into(),
         title: "Flappy Bird Clone".into(),
         decorations: true,
-        resizable: false,
+        resizable: true,
         ..default()
     };
 
