@@ -1,13 +1,12 @@
 use crate::pipe::components::{PipePair, Scorable};
 use crate::player::components::{Player, FLAP_STRENGTH, GRAVITY};
 use crate::score::resources::Score;
+use crate::sounds::{play_sound, Sounds};
 use crate::GameState;
-use bevy::audio::AudioLoader;
 use bevy::input::touch::TouchPhase;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;
-use bevy_rapier2d::rapier::dynamics::RigidBodyForces;
 use std::default::Default;
 
 // TODO: Figure out how to get the correct window size
@@ -37,7 +36,6 @@ pub fn player_movement(
     keyboard_input: Res<Input<KeyCode>>,
     touch_input: Res<Events<TouchInput>>,
     game_state: Res<State<GameState>>,
-    mut next_game_state: ResMut<NextState<GameState>>,
     mut player_query: Query<(&mut Velocity, &mut Transform, &mut GravityScale), With<Player>>,
     time: Res<Time>,
 ) {
@@ -60,11 +58,7 @@ pub fn player_movement(
             velocity.linvel = FLAP_STRENGTH;
             debug!("Velocity: {:?}", velocity);
             transform.rotation = Quat::from_rotation_z(max_rotation);
-            commands.spawn(AudioBundle {
-                source: asset_server.load("audio/wing.ogg"),
-                settings: PlaybackSettings::DESPAWN,
-                ..default()
-            });
+            play_sound(&mut commands, &asset_server, Sounds::FLAP);
         }
 
         // Determine rotation direction based on vertical velocity
@@ -81,11 +75,7 @@ pub fn player_movement(
         if event.phase == TouchPhase::Started {
             // If there's a touch, consider it as a 'flap' action
             if let Ok((mut velocity, mut transform, mut gravity)) = player_query.get_single_mut() {
-                commands.spawn(AudioBundle {
-                    source: asset_server.load("audio/wing.ogg"),
-                    settings: PlaybackSettings::DESPAWN,
-                    ..default()
-                });
+                play_sound(&mut commands, &asset_server, Sounds::FLAP);
                 debug!("Velocity: {:?}", velocity);
                 velocity.linvel = FLAP_STRENGTH;
                 transform.rotation = Quat::from_rotation_z(max_rotation);
@@ -135,11 +125,7 @@ pub fn check_if_scored(
                 // Increment score
                 score.value += 1;
                 scorable.scored = true;
-                commands.spawn(AudioBundle {
-                    source: asset_server.load("audio/point.ogg"),
-                    settings: PlaybackSettings::DESPAWN,
-                    ..default()
-                });
+                play_sound(&mut commands, &asset_server, Sounds::POINT);
 
                 break; // Prevents multiple increments for the same pipe pair
             }

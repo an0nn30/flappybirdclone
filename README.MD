@@ -65,7 +65,7 @@ This project is licensed under MIT License. Feel free to use, modify, and distri
 
 ## TODOs
 
-- [ ] add collision detection for the ground and pipes
-- [ ] add detection for passing through pipes to add to score
+- [X] add collision detection for the ground and pipes
+- [X] add detection for passing through pipes to add to score
 - [ ] add score tracking
 - [ ] add UI

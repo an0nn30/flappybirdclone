@@ -1,5 +1,7 @@
 use crate::pipe::components::PipePair;
 use crate::player::components::Player;
+use crate::sounds::{play_sound, Sounds};
+use crate::ui::components::WelcomeMessage;
 use crate::world::components::Ground;
 use crate::GameState;
 use bevy::input::touch::TouchPhase;
@@ -14,7 +16,7 @@ pub fn global_input(
 ) {
     if keyboard_input.just_pressed(KeyCode::P) {
         if current_app_state.get().eq(&(GameState::Running).into()) {
-            next_app_state.set(GameState::GameOver);
+            next_app_state.set(GameState::Paused);
         } else {
             next_app_state.set(GameState::Running);
         }
@@ -47,11 +49,7 @@ pub fn check_collision(
             // Check if the bird is involved in the collision
             if bird_entity == *entity1 || bird_entity == *entity2 {
                 debug!("Collision happened!");
-                commands.spawn(AudioBundle {
-                    source: asset_server.load("audio/hit.ogg"),
-                    settings: PlaybackSettings::DESPAWN,
-                    ..default()
-                });
+                play_sound(&mut commands, &asset_server, Sounds::HIT);
                 game_state.set(GameState::GameOver);
                 break;
             }

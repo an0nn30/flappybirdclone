@@ -2,6 +2,7 @@ use crate::game::GamePlugin;
 use crate::pipe::PipePlugin;
 use crate::player::PlayerPlugin;
 use crate::score::ScorePlugin;
+use crate::ui::UIPlugin;
 use crate::world::WorldPlugin;
 use bevy::log::{Level, LogPlugin};
 use bevy::prelude::*;
@@ -16,6 +17,7 @@ mod systems;
 mod world;
 
 mod pipe;
+mod sounds;
 mod ui;
 
 #[bevy_main]
@@ -32,6 +34,7 @@ pub fn main() {
         )
         .add_state::<GameState>()
         // .add_plugins(RapierDebugRenderPlugin::default())
+        .add_plugins(UIPlugin)
         .add_plugins(GamePlugin)
         .add_plugins(WorldPlugin)
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
@@ -106,6 +109,7 @@ fn setup_window() -> WindowPlugin {
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 pub enum GameState {
     Running,
-    #[default]
     GameOver,
+    #[default]
+    Paused,
 }
