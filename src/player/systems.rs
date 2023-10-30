@@ -1,7 +1,8 @@
 use crate::pipe::components::{PipePair, Scorable};
-use crate::player::components::Player;
+use crate::player::components::{Player, FLAP_STRENGTH, GRAVITY};
 use crate::score::resources::Score;
 use crate::GameState;
+use bevy::audio::AudioLoader;
 use bevy::input::touch::TouchPhase;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -26,12 +27,13 @@ pub fn spawn_player(
         RigidBody::Dynamic,
         Collider::cuboid(collider_size.x / 2.0, collider_size.y / 2.0),
         Velocity::zero(),
-        GravityScale(9.8),
+        GravityScale(GRAVITY),
     )); // Normal gravity scale, adjust if needed
 }
 
 pub fn player_movement(
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
     keyboard_input: Res<Input<KeyCode>>,
     touch_input: Res<Events<TouchInput>>,
     game_state: Res<State<GameState>>,
@@ -39,9 +41,6 @@ pub fn player_movement(
     mut player_query: Query<(&mut Velocity, &mut Transform, &mut GravityScale), With<Player>>,
     time: Res<Time>,
 ) {
-    // Define the flap strength
-    let flap_strength = Vec2::new(0.0, 350.0); // Adjust as needed
-
     let rotation_speed = 90.5; // Adjust as needed
     let max_rotation = 30.0f32.to_radians(); // 90 degrees in radians
     let min_rotation = -30.0f32.to_radians(); // -30 degrees in radians
@@ -52,15 +51,20 @@ pub fn player_movement(
             gravity.0 = 0.0;
             return;
         } else {
-            gravity.0 = 9.8;
+            gravity.0 = GRAVITY;
         }
 
         if keyboard_input.just_pressed(KeyCode::Space) {
             // Flap on spacebar press
             // Apply the flap force
-            velocity.linvel = flap_strength;
+            velocity.linvel = FLAP_STRENGTH;
             debug!("Velocity: {:?}", velocity);
             transform.rotation = Quat::from_rotation_z(max_rotation);
+            commands.spawn(AudioBundle {
+                source: asset_server.load("audio/wing.ogg"),
+                settings: PlaybackSettings::DESPAWN,
+                ..default()
+            });
         }
 
         // Determine rotation direction based on vertical velocity
@@ -77,8 +81,13 @@ pub fn player_movement(
         if event.phase == TouchPhase::Started {
             // If there's a touch, consider it as a 'flap' action
             if let Ok((mut velocity, mut transform, mut gravity)) = player_query.get_single_mut() {
+                commands.spawn(AudioBundle {
+                    source: asset_server.load("audio/wing.ogg"),
+                    settings: PlaybackSettings::DESPAWN,
+                    ..default()
+                });
                 debug!("Velocity: {:?}", velocity);
-                velocity.linvel = flap_strength;
+                velocity.linvel = FLAP_STRENGTH;
                 transform.rotation = Quat::from_rotation_z(max_rotation);
             }
         }
@@ -104,9 +113,11 @@ fn setup_sprite(asset_server: &AssetServer, window: &Window) -> SpriteBundle {
 }
 
 pub fn check_if_scored(
+    mut commands: Commands,
     mut score: ResMut<Score>,
     bird_query: Query<&Transform, With<Player>>,
     mut pipe_query: Query<(&Transform, &mut Scorable), With<PipePair>>,
+    asset_server: Res<AssetServer>,
 ) {
     if let Ok(bird_transform) = bird_query.get_single() {
         let bird_x = bird_transform.translation.x;
@@ -124,6 +135,12 @@ pub fn check_if_scored(
                 // Increment score
                 score.value += 1;
                 scorable.scored = true;
+                commands.spawn(AudioBundle {
+                    source: asset_server.load("audio/point.ogg"),
+                    settings: PlaybackSettings::DESPAWN,
+                    ..default()
+                });
+
                 break; // Prevents multiple increments for the same pipe pair
             }
         }

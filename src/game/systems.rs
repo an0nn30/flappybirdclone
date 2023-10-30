@@ -28,7 +28,9 @@ pub fn global_input(
 }
 
 pub fn check_collision(
+    mut commands: Commands,
     mut collision_events: EventReader<CollisionEvent>,
+    asset_server: Res<AssetServer>,
     bird_query: Query<Entity, With<Player>>,
     ground_query: Query<Entity, With<Ground>>,
     pipe_query: Query<Entity, With<PipePair>>,
@@ -45,18 +47,13 @@ pub fn check_collision(
             // Check if the bird is involved in the collision
             if bird_entity == *entity1 || bird_entity == *entity2 {
                 debug!("Collision happened!");
+                commands.spawn(AudioBundle {
+                    source: asset_server.load("audio/hit.ogg"),
+                    settings: PlaybackSettings::DESPAWN,
+                    ..default()
+                });
                 game_state.set(GameState::GameOver);
                 break;
-                // Check if the collision is with the ground or a pipe
-                // if ground_entities.contains(entity1)
-                //     || ground_entities.contains(entity2)
-                //     || pipe_entities.contains(entity1)
-                //     || pipe_entities.contains(entity2)
-                // {
-                //     // Change the game state to GameOver
-                //     game_state.set(GameState::GameOver);
-                //     break; // Exit the loop once a collision is detected
-                // }
             }
         }
     }

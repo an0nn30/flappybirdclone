@@ -90,7 +90,7 @@ fn setup_window() -> WindowPlugin {
 
     #[cfg(not(target_os = "ios"))]
     let window = Window {
-        resolution: (288., 512.).into(),
+        resolution: (400., 512.).into(),
         title: "Flappy Bird Clone".into(),
         decorations: true,
         resizable: false,
