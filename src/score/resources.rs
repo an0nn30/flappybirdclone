@@ -3,11 +3,15 @@ use bevy::prelude::*;
 #[derive(Resource)]
 pub struct Score {
     pub value: u32,
+    pub display_entity: Option<Entity>,
 }
 
 impl Default for Score {
     fn default() -> Score {
-        Score { value: 0 }
+        Score {
+            value: 0,
+            display_entity: None,
+        }
     }
 }
 

@@ -107,8 +107,10 @@ pub fn check_if_scored(
     mut score: ResMut<Score>,
     bird_query: Query<&Transform, With<Player>>,
     mut pipe_query: Query<(&Transform, &mut Scorable), With<PipePair>>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
     asset_server: Res<AssetServer>,
 ) {
+    let window = window_query.get_single().unwrap();
     if let Ok(bird_transform) = bird_query.get_single() {
         let bird_x = bird_transform.translation.x;
 
@@ -125,10 +127,51 @@ pub fn check_if_scored(
                 // Increment score
                 score.value += 1;
                 scorable.scored = true;
+                update_score(&mut commands, &asset_server, score, window);
                 play_sound(&mut commands, &asset_server, Sounds::POINT);
 
                 break; // Prevents multiple increments for the same pipe pair
             }
         }
+    }
+}
+
+fn update_score(
+    mut commands: &mut Commands,
+    asset_server: &AssetServer,
+    mut score: ResMut<Score>,
+    window: &Window,
+) {
+    // Check if there is an existing score display entity and despawn it along with its children
+    if let Some(entity) = score.display_entity {
+        commands.entity(entity).despawn_recursive();
+        score.display_entity = None;
+    }
+
+    // Logic for spawning the new score display based on `score.value`...
+    let score_string = score.value.to_string();
+    let number_width = 20.0; // Adjust this value as needed for your textures
+
+    // Create a new parent entity for the score display
+    let parent_entity = commands
+        .spawn(SpriteBundle {
+            transform: Transform::from_xyz(window.width() / 2., window.height() / 2. + 200.0, 1.),
+            ..default()
+        })
+        .id();
+    score.display_entity = Some(parent_entity);
+
+    // Spawn children entities for each digit in the score
+    for (i, digit) in score_string.chars().enumerate() {
+        let texture_path = format!("textures/{}.png", digit);
+        let texture_handle = asset_server.load(&texture_path);
+
+        commands.entity(parent_entity).with_children(|parent| {
+            parent.spawn(SpriteBundle {
+                texture: texture_handle,
+                transform: Transform::from_xyz(i as f32 * number_width, 0., 1.0),
+                ..Default::default()
+            });
+        });
     }
 }
