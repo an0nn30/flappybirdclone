@@ -19,6 +19,7 @@ build:
 
 # Install and run on iOS Simulator
 ios-sim: build-ios-sim
+	open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
 	xcrun simctl install booted "target/aarch64-apple-ios-sim/debug/bundle/ios/$(APP_NAME).app"
 	xcrun simctl launch --console booted $(BUNDLE_ID)
 

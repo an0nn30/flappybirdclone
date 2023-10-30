@@ -1,6 +1,7 @@
 use crate::game::GamePlugin;
 use crate::pipe::PipePlugin;
 use crate::player::PlayerPlugin;
+use crate::score::ScorePlugin;
 use crate::world::WorldPlugin;
 use bevy::log::{Level, LogPlugin};
 use bevy::prelude::*;
@@ -10,6 +11,7 @@ use bevy_rapier2d::prelude::*;
 
 mod game;
 mod player;
+pub mod score;
 mod systems;
 mod world;
 
@@ -35,6 +37,7 @@ pub fn main() {
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugins(PlayerPlugin)
         .add_plugins(PipePlugin)
+        .add_plugins(ScorePlugin)
         .add_systems(Startup, spawn_camera)
         .run();
 }

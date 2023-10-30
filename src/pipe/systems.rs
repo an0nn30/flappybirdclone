@@ -1,6 +1,7 @@
-use crate::pipe::components::PipePair;
+use crate::pipe::components::{PipePair, Scorable};
 use crate::pipe::resources::PipeSpawnTimer;
 use bevy::prelude::*;
+use bevy::utils::tracing::Instrument;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;
 use log::debug;
@@ -19,7 +20,8 @@ pub fn spawn_pipes(
         debug!("Spawning pipe on y: {}", y);
         commands
             .entity(pipe_pair_entity)
-            .insert(Transform::from_xyz(window.width() + 50., y, 0.0));
+            .insert(Transform::from_xyz(window.width() + 50., y, 0.0))
+            .insert(Scorable { scored: false });
     }
 }
 

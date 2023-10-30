@@ -1,4 +1,6 @@
+use crate::pipe::components::{PipePair, Scorable};
 use crate::player::components::Player;
+use crate::score::resources::Score;
 use crate::GameState;
 use bevy::input::touch::TouchPhase;
 use bevy::prelude::*;
@@ -98,5 +100,32 @@ fn setup_sprite(asset_server: &AssetServer, window: &Window) -> SpriteBundle {
         transform: Transform::from_xyz(window.width() / 2., window.height() / 2., 0.),
         sprite,
         ..default()
+    }
+}
+
+pub fn check_if_scored(
+    mut score: ResMut<Score>,
+    bird_query: Query<&Transform, With<Player>>,
+    mut pipe_query: Query<(&Transform, &mut Scorable), With<PipePair>>,
+) {
+    if let Ok(bird_transform) = bird_query.get_single() {
+        let bird_x = bird_transform.translation.x;
+
+        for (pipe_transform, mut scorable) in pipe_query.iter_mut() {
+            if scorable.scored {
+                continue;
+            }
+            let pipe_x = pipe_transform.translation.x;
+
+            // Define a tolerance for when the score should be incremented
+            let tolerance = 10.0; // Adjust this value as needed
+
+            if (bird_x - pipe_x).abs() < tolerance {
+                // Increment score
+                score.value += 1;
+                scorable.scored = true;
+                break; // Prevents multiple increments for the same pipe pair
+            }
+        }
     }
 }
