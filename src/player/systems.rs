@@ -74,7 +74,7 @@ pub fn player_movement(
     for event in touch_input.get_reader().iter(&touch_input) {
         if event.phase == TouchPhase::Started {
             // If there's a touch, consider it as a 'flap' action
-            if let Ok((mut velocity, mut transform, mut gravity)) = player_query.get_single_mut() {
+            if let Ok((mut velocity, mut transform, _gravity)) = player_query.get_single_mut() {
                 play_sound(&mut commands, &asset_server, Sounds::FLAP);
                 debug!("Velocity: {:?}", velocity);
                 velocity.linvel = FLAP_STRENGTH;

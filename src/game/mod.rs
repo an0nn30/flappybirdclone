@@ -1,5 +1,5 @@
 use crate::game::systems::{check_collision, global_input};
-use crate::GameState;
+
 use bevy::prelude::*;
 
 pub mod components;

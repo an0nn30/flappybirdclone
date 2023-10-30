@@ -1,15 +1,7 @@
 use bevy::prelude::*;
 
 #[derive(Component)]
-pub struct Pipe {
-    pub orientation: PipeOrientation,
-}
-
-#[derive(Component)]
-pub enum PipeOrientation {
-    Up,
-    Down,
-}
+pub struct Pipe {}
 
 #[derive(Component)]
 pub struct PipePair {

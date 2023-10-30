@@ -1,7 +1,7 @@
 use crate::player::systems::{check_if_scored, player_movement, spawn_player};
-use crate::GameState;
+
 use bevy::prelude::*;
-use std::sync::OnceState;
+
 
 pub mod components;
 mod systems;

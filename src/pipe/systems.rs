@@ -1,7 +1,7 @@
 use crate::pipe::components::{PipePair, Scorable};
 use crate::pipe::resources::PipeSpawnTimer;
 use bevy::prelude::*;
-use bevy::utils::tracing::Instrument;
+
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;
 use log::debug;
@@ -44,7 +44,7 @@ pub fn pipe_movement(
 fn build_pipe_pair(
     commands: &mut Commands,
     asset_server: &Res<AssetServer>,
-    window_query: &Query<&Window, With<PrimaryWindow>>,
+    _window_query: &Query<&Window, With<PrimaryWindow>>,
 ) -> Entity {
     let spacing = 300.;
 
@@ -110,22 +110,4 @@ pub fn tick_pipe_spawn_timer(mut pipe_spawn_timer: ResMut<PipeSpawnTimer>, time:
 fn random_range(min: f32, max: f32) -> f32 {
     let mut rng = rand::thread_rng(); // Get a copy of the random number generator
     rng.gen_range(min..max) // Generate a random number in the range
-}
-
-fn setup_sprite(asset_server: &AssetServer, window: &Window) -> SpriteBundle {
-    #[cfg(target_os = "ios")]
-    let sprite = Sprite {
-        custom_size: Some(Vec2::new(36., 34.)),
-        ..default()
-    };
-
-    #[cfg(not(target_os = "ios"))]
-    let sprite = Sprite::default();
-
-    SpriteBundle {
-        texture: asset_server.load("textures/yellowbird-midflap.png"),
-        transform: Transform::from_xyz(window.width() / 2., window.height() / 2., 0.),
-        sprite,
-        ..default()
-    }
 }

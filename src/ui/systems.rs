@@ -34,7 +34,7 @@ pub fn toggle_welcome_message(
 // TODO: Change this so that we only run the system on game over event from the plugin, not within the system
 pub fn spawn_game_over(
     mut commands: Commands,
-    game_state: Res<State<GameState>>,
+    _game_state: Res<State<GameState>>,
     asset_server: Res<AssetServer>,
     window_query: Query<&Window, With<PrimaryWindow>>,
 ) {

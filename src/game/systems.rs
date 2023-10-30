@@ -1,7 +1,7 @@
 use crate::pipe::components::PipePair;
 use crate::player::components::Player;
 use crate::sounds::{play_sound, Sounds};
-use crate::ui::components::WelcomeMessage;
+
 use crate::world::components::Ground;
 use crate::GameState;
 use bevy::input::touch::TouchPhase;
@@ -41,8 +41,8 @@ pub fn check_collision(
     let bird_entity = bird_query.single();
 
     // Collect the ground and pipe entities into vectors for easy searching
-    let ground_entities: Vec<Entity> = ground_query.iter().collect();
-    let pipe_entities: Vec<Entity> = pipe_query.iter().collect();
+    let _ground_entities: Vec<Entity> = ground_query.iter().collect();
+    let _pipe_entities: Vec<Entity> = pipe_query.iter().collect();
 
     for collision_event in collision_events.iter() {
         if let CollisionEvent::Started(entity1, entity2, _) = collision_event {

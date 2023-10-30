@@ -6,9 +6,9 @@ use crate::ui::UIPlugin;
 use crate::world::WorldPlugin;
 use bevy::log::{Level, LogPlugin};
 use bevy::prelude::*;
-use bevy::window::{PrimaryWindow, WindowMode};
+use bevy::window::{PrimaryWindow};
 use bevy_rapier2d::plugin::{NoUserData, RapierPhysicsPlugin};
-use bevy_rapier2d::prelude::*;
+
 
 mod game;
 mod player;
