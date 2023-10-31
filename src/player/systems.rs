@@ -1,5 +1,6 @@
 use crate::pipe::components::{PipePair, Scorable};
-use crate::player::components::{Player, FLAP_STRENGTH, GRAVITY};
+use crate::player::components::{BirdFlap, Player, FLAP_STRENGTH, GRAVITY};
+use crate::player::resources::BirdTextures;
 use crate::score::resources::Score;
 use crate::sounds::{play_sound, Sounds};
 use crate::ui::components::ScoreText;
@@ -15,6 +16,7 @@ pub fn spawn_player(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     window_query: Query<&Window, With<PrimaryWindow>>,
+    bird_textures: Res<BirdTextures>,
 ) {
     let window = window_query.get_single().unwrap();
 
@@ -22,12 +24,13 @@ pub fn spawn_player(
     let collider_size = Vec2::new(16.0, 16.0); // Adjust the size as needed
 
     commands.spawn((
-        setup_sprite(&asset_server, &window),
+        setup_sprite(&window, &bird_textures),
         Player,
         RigidBody::Dynamic,
         Collider::cuboid(collider_size.x / 2.0, collider_size.y / 2.0),
         Velocity::zero(),
         GravityScale(GRAVITY),
+        BirdFlap::default(),
     )); // Normal gravity scale, adjust if needed
 }
 
@@ -85,7 +88,7 @@ pub fn player_movement(
     }
 }
 
-fn setup_sprite(asset_server: &AssetServer, window: &Window) -> SpriteBundle {
+fn setup_sprite(window: &Window, texture: &BirdTextures) -> SpriteBundle {
     // #[cfg(target_os = "ios")]
     // let sprite = Sprite {
     //     custom_size: Some(Vec2::new(40., 30.)),
@@ -96,7 +99,7 @@ fn setup_sprite(asset_server: &AssetServer, window: &Window) -> SpriteBundle {
     let sprite = Sprite::default();
 
     SpriteBundle {
-        texture: asset_server.load("textures/yellowbird-midflap.png"),
+        texture: texture.textures[1].clone(),
         transform: Transform::from_xyz(window.width() / 2., window.height() / 2., 0.),
         sprite,
         ..default()
@@ -209,4 +212,33 @@ pub fn reset_score(
     }
     score.value = 0;
     score.display_entity = None;
+}
+
+pub fn bird_flap_animation(
+    time: Res<Time>,
+    bird_textures: Res<BirdTextures>,
+    mut query: Query<(&mut BirdFlap, &mut Handle<Image>)>,
+    game_state: Res<State<GameState>>,
+) {
+    if game_state.get().ne(&(GameState::Running)) {
+        return;
+    }
+
+    for (mut flap, mut texture) in query.iter_mut() {
+        flap.timer.tick(time.delta());
+        if flap.timer.just_finished() {
+            flap.flap_state = (flap.flap_state + 1) % bird_textures.textures.len();
+            *texture = bird_textures.textures[flap.flap_state].clone();
+        }
+    }
+}
+
+pub fn animation_setup(asset_server: Res<AssetServer>, mut bird_textures: ResMut<BirdTextures>) {
+    let textures = vec![
+        asset_server.load("textures/yellowbird-downflap.png"),
+        asset_server.load("textures/yellowbird-midflap.png"),
+        asset_server.load("textures/yellowbird-upflap.png"),
+    ];
+
+    bird_textures.textures = textures;
 }
