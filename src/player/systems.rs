@@ -1,6 +1,6 @@
 use crate::pipe::components::{PipePair, Scorable};
 use crate::player::components::{BirdFlap, Player, FLAP_STRENGTH, GRAVITY};
-use crate::player::resources::BirdTextures;
+use crate::player::resources::{BirdTextures, PlayerFlightState};
 use crate::score::resources::Score;
 use crate::sounds::{play_sound, Sounds};
 use crate::ui::components::ScoreText;
@@ -42,6 +42,9 @@ pub fn player_movement(
     game_state: Res<State<GameState>>,
     mut player_query: Query<(&mut Velocity, &mut Transform, &mut GravityScale), With<Player>>,
     time: Res<Time>,
+    mut player_state: ResMut<NextState<PlayerFlightState>>,
+    bird_textures: Res<BirdTextures>,
+    mut query: Query<(&mut BirdFlap, &mut Handle<Image>)>,
 ) {
     let rotation_speed = 90.5; // Adjust as needed
     let max_rotation = 30.0f32.to_radians(); // 90 degrees in radians
@@ -60,9 +63,19 @@ pub fn player_movement(
             // Flap on spacebar press
             // Apply the flap force
             velocity.linvel = FLAP_STRENGTH;
+            player_state.set(PlayerFlightState::Flying);
             debug!("Velocity: {:?}", velocity);
             transform.rotation = Quat::from_rotation_z(max_rotation);
             play_sound(&mut commands, &asset_server, Sounds::FLAP);
+        }
+
+        if velocity.linvel.y < 0. {
+            player_state.set(PlayerFlightState::Falling);
+        } else {
+            if let Ok((mut _flap, mut texture)) = query.get_single_mut() {
+                debug!("Changing to flying");
+                *texture = bird_textures.textures[0].clone();
+            }
         }
 
         // Determine rotation direction based on vertical velocity
@@ -141,7 +154,7 @@ pub fn check_if_scored(
 }
 
 fn update_score(
-    mut commands: &mut Commands,
+    commands: &mut Commands,
     asset_server: &AssetServer,
     mut score: ResMut<Score>,
     window: &Window,
@@ -188,7 +201,6 @@ fn update_score(
 }
 
 pub fn reset_player(
-    mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
     mut bird_query: Query<(&mut Velocity, &mut Transform, &mut GravityScale), With<Player>>,
 ) {
@@ -223,7 +235,6 @@ pub fn bird_flap_animation(
     if game_state.get().ne(&(GameState::Running)) {
         return;
     }
-
     for (mut flap, mut texture) in query.iter_mut() {
         flap.timer.tick(time.delta());
         if flap.timer.just_finished() {

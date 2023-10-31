@@ -10,3 +10,10 @@ impl Default for BirdTextures {
         Self { textures: vec![] }
     }
 }
+
+#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
+pub enum PlayerFlightState {
+    Flying,
+    #[default]
+    Falling,
+}

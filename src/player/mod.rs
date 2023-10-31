@@ -3,7 +3,7 @@ use crate::player::systems::{
     reset_score, spawn_player,
 };
 
-use crate::player::resources::BirdTextures;
+use crate::player::resources::{BirdTextures, PlayerFlightState};
 use crate::GameState;
 use bevy::prelude::*;
 
@@ -21,6 +21,7 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<BirdTextures>()
+            .add_state::<PlayerFlightState>()
             .add_systems(
                 Startup,
                 (animation_setup, spawn_player.after(animation_setup)),
@@ -30,7 +31,7 @@ impl Plugin for PlayerPlugin {
                 (
                     player_movement,
                     check_if_scored,
-                    bird_flap_animation,
+                    bird_flap_animation.run_if(in_state(PlayerFlightState::Falling)),
                     (reset_player, reset_score).run_if(in_state(GameState::Reset)),
                 ),
             );
