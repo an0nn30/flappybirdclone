@@ -1,5 +1,4 @@
-use crate::score::resources::Score;
-use crate::ui::components::{GameOverMessage, ScoreText, WelcomeMessage};
+use crate::ui::components::{GameOverMessage, WelcomeMessage};
 use crate::GameState;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -13,7 +12,7 @@ pub fn spawn_welcome(
     commands.spawn((
         SpriteBundle {
             texture: asset_server.load("textures/message.png"),
-            transform: Transform::from_xyz(window.width() / 2., window.height() / 2., 0.),
+            transform: Transform::from_xyz(window.width() / 2., window.height() / 2. + 47., 0.),
             ..default()
         },
         WelcomeMessage,

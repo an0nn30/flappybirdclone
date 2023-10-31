@@ -14,7 +14,7 @@ use std::default::Default;
 // TODO: Figure out how to get the correct window size
 pub fn spawn_player(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    _asset_server: Res<AssetServer>,
     window_query: Query<&Window, With<PrimaryWindow>>,
     bird_textures: Res<BirdTextures>,
 ) {
@@ -112,7 +112,7 @@ fn setup_sprite(window: &Window, texture: &BirdTextures) -> SpriteBundle {
     let sprite = Sprite::default();
 
     SpriteBundle {
-        texture: texture.textures[1].clone(),
+        texture: texture.textures[0].clone(),
         transform: Transform::from_xyz(window.width() / 2., window.height() / 2., 0.),
         sprite,
         ..default()

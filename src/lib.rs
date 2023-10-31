@@ -32,9 +32,8 @@ pub fn main() {
                     filter: "wgpu=error,bevy_render=info,bevy_ecs=trace,winit=error".to_string(),
                 })),
         )
-        .add_plugins(EditorPlugin::default())
+        // .add_plugins(EditorPlugin::default())
         .add_state::<GameState>()
-        // .add_plugins(RapierDebugRenderPlugin::default())
         .add_plugins(UIPlugin)
         .add_plugins(GamePlugin)
         .add_plugins(WorldPlugin)
