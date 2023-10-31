@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 #[derive(Component)]
-pub struct Pipe {}
+pub struct Pipe;
 
 #[derive(Component)]
 pub struct PipePair {

@@ -2,6 +2,7 @@ use crate::pipe::components::{PipePair, Scorable};
 use crate::player::components::{Player, FLAP_STRENGTH, GRAVITY};
 use crate::score::resources::Score;
 use crate::sounds::{play_sound, Sounds};
+use crate::ui::components::ScoreText;
 use crate::GameState;
 use bevy::input::touch::TouchPhase;
 use bevy::prelude::*;
@@ -154,10 +155,17 @@ fn update_score(
 
     // Create a new parent entity for the score display
     let parent_entity = commands
-        .spawn(SpriteBundle {
-            transform: Transform::from_xyz(window.width() / 2., window.height() / 2. + 200.0, 1.),
-            ..default()
-        })
+        .spawn((
+            SpriteBundle {
+                transform: Transform::from_xyz(
+                    window.width() / 2.,
+                    window.height() / 2. + 200.0,
+                    1.,
+                ),
+                ..default()
+            },
+            ScoreText,
+        ))
         .id();
     score.display_entity = Some(parent_entity);
 
@@ -174,4 +182,31 @@ fn update_score(
             });
         });
     }
+}
+
+pub fn reset_player(
+    mut commands: Commands,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    mut bird_query: Query<(&mut Velocity, &mut Transform, &mut GravityScale), With<Player>>,
+) {
+    let window = window_query.get_single().unwrap();
+    let (mut velocity, mut transform, mut gravity) = bird_query.get_single_mut().unwrap();
+    velocity.linvel = Vec2::new(0., 0.);
+    transform.translation = Vec3::new(window.width() / 2., window.height() / 2., 0.);
+    transform.rotation = Quat::from_rotation_z(0.);
+    gravity.0 = 0.;
+}
+
+// TODO: This does not despawn the pipes if we've scored...for some reason...
+pub fn reset_score(
+    mut commands: Commands,
+    score_query: Query<Entity, With<ScoreText>>,
+    mut score: ResMut<Score>,
+) {
+    if let Ok(score) = score_query.get_single() {
+        debug!("Despawning score");
+        commands.entity(score).despawn_recursive();
+    }
+    score.value = 0;
+    score.display_entity = None;
 }

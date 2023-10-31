@@ -6,9 +6,9 @@ use crate::ui::UIPlugin;
 use crate::world::WorldPlugin;
 use bevy::log::{Level, LogPlugin};
 use bevy::prelude::*;
-use bevy::window::{PrimaryWindow};
+use bevy::window::PrimaryWindow;
+use bevy_editor_pls::EditorPlugin;
 use bevy_rapier2d::plugin::{NoUserData, RapierPhysicsPlugin};
-
 
 mod game;
 mod player;
@@ -32,6 +32,7 @@ pub fn main() {
                     filter: "wgpu=error,bevy_render=info,bevy_ecs=trace,winit=error".to_string(),
                 })),
         )
+        .add_plugins(EditorPlugin::default())
         .add_state::<GameState>()
         // .add_plugins(RapierDebugRenderPlugin::default())
         .add_plugins(UIPlugin)
@@ -96,7 +97,7 @@ fn setup_window() -> WindowPlugin {
         resolution: (400., 512.).into(),
         title: "Flappy Bird Clone".into(),
         decorations: true,
-        resizable: false,
+        resizable: true,
         ..default()
     };
 
@@ -112,4 +113,5 @@ pub enum GameState {
     GameOver,
     #[default]
     Paused,
+    Reset,
 }

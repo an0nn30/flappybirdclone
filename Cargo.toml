@@ -41,3 +41,5 @@ bevy = "0.11.3"
 rand = "0.8.5"
 bevy_rapier2d = {  version = "0.22.0", features = [ "simd-stable", "debug-render-2d" ] }
 log = "0.4.20"
+bevy_editor_pls = "0.5.0"
+bevy_embedded_assets = "0.8.0"

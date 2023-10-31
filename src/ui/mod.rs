@@ -1,4 +1,4 @@
-use crate::ui::systems::{spawn_game_over, spawn_welcome, toggle_welcome_message, update_score};
+use crate::ui::systems::{reset_game_over, spawn_game_over, spawn_welcome, toggle_welcome_message};
 use crate::GameState;
 use bevy::prelude::*;
 
@@ -14,7 +14,7 @@ impl Plugin for UIPlugin {
             (
                 toggle_welcome_message,
                 spawn_game_over.run_if(in_state(GameState::GameOver)),
-                // update_score.run_if(in_state(GameState::Running)),
+                reset_game_over.run_if(in_state(GameState::Reset)),
             ),
         );
     }

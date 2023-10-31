@@ -1,4 +1,4 @@
-use crate::pipe::components::{PipePair, Scorable};
+use crate::pipe::components::{Pipe, PipePair, Scorable};
 use crate::pipe::resources::PipeSpawnTimer;
 use bevy::prelude::*;
 
@@ -36,7 +36,7 @@ pub fn pipe_movement(
         let speed = 150.;
         transform.translation.x -= speed * time.delta_seconds();
         if transform.translation.x < -window.width() {
-            commands.entity(entity).despawn();
+            commands.entity(entity).despawn_recursive();
         }
     }
 }
@@ -52,12 +52,14 @@ fn build_pipe_pair(
     let collider_size = Vec2::new(52., 480.);
     // Common components for both ground sprites
     let pipe1_components = (
+        Pipe,
         RigidBody::Fixed,
         Collider::cuboid(collider_size.x / 2.0, collider_size.y / 2.0),
         ActiveEvents::COLLISION_EVENTS,
     );
 
     let pipe2_components = (
+        Pipe,
         RigidBody::Fixed,
         Collider::cuboid(collider_size.x / 2.0, collider_size.y / 2.0),
         ActiveEvents::COLLISION_EVENTS,
@@ -110,4 +112,10 @@ pub fn tick_pipe_spawn_timer(mut pipe_spawn_timer: ResMut<PipeSpawnTimer>, time:
 fn random_range(min: f32, max: f32) -> f32 {
     let mut rng = rand::thread_rng(); // Get a copy of the random number generator
     rng.gen_range(min..max) // Generate a random number in the range
+}
+
+pub fn reset_pipes(mut commands: Commands, mut pipe_query: Query<Entity, With<PipePair>>) {
+    for entity in pipe_query.iter_mut() {
+        commands.entity(entity).despawn_recursive();
+    }
 }
